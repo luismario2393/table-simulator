@@ -58,6 +58,8 @@ class UI {
   }
 
   addTable({ users }) {
+    this.limpiarHTML();
+
     let html = "";
 
     users.forEach((user) => {
@@ -79,6 +81,13 @@ class UI {
     });
 
     table.innerHTML = html;
+    storage();
+  }
+
+  limpiarHTML() {
+    while (table.firstChild) {
+      table.removeChild(table.firstChild);
+    }
   }
 }
 
@@ -113,7 +122,15 @@ const fetchApi = async () => {
 
 eventListeners();
 function eventListeners() {
-  addEventListener("DOMContentLoaded", fetchApi);
+  document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("users")) {
+      users.users = JSON.parse(localStorage.getItem("users") || []);
+      ui.addTable(users);
+    } else {
+      fetchApi();
+    }
+  });
+
   nameInput.addEventListener("input", dataUser);
   lastNameInput.addEventListener("input", dataUser);
   emailInput.addEventListener("input", dataUser);
@@ -189,4 +206,8 @@ function loadEdition(id) {
   usersObj.date = userEdit[0].date;
 
   editing = true;
+}
+
+function storage() {
+  localStorage.setItem("users", JSON.stringify(users.users));
 }
